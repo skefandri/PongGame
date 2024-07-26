@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+</head>
+<body>
+    <h1>Ping Pong Game</h1>
+    <canvas id="gameCanvas" width="600" height="400" style="border: 2px solid red;background-color: black;margin: 150px;"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+
+        const paddleWidth = 10;
+        const paddleHeight = 75;
+        const playerX = 0;  // X position of player paddle
+        const aiX = canvas.width - paddleWidth;  // X position of AI paddle
+        let playerY = (canvas.height - paddleHeight) / 2;  // Y position of player paddle
+        let aiY = (canvas.height - paddleHeight) / 2;  // Y position of AI paddle
+
+        const ballRadius = 10;
+        let ballX = canvas.width / 2;  // Initial X position of ball
+        let ballY = canvas.height / 2;  // Initial Y position of ball
+        let ballSpeedX = 2;  // Speed of ball in X direction
+        let ballSpeedY = 2;  // Speed of ball in Y direction
+
+        // Step 2: Draw paddles on the canvas
+        function drawPaddles() {
+            // Draw player paddle
+            context.fillStyle = 'white';
+            context.fillRect(playerX, playerY, paddleWidth, paddleHeight);
+
+            // Draw AI paddle
+            context.fillStyle = 'white';
+            context.fillRect(aiX, aiY, paddleWidth, paddleHeight);
+        }
+
+        // Step 3: Draw the ball on the canvas
+        function drawBall() {
+            //begin the path. kangol bli bdit kanrsam wahd lmasar
+            context.beginPath();
+            console.log( "text: " + context.beginPath());
+            context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            console.log("arc: "+ context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2));
+            context.fillStyle = 'white';
+            context.fill();
+            console.log("fill: " + context.fill());
+            context.closePath();
+        }
+
+        // Update the ball's position
+        function updateBall() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            // Check for collision with top and bottom walls
+            if (ballY + ballRadius > canvas.height || ballY - ballRadius < 0) {
+                ballSpeedY = -ballSpeedY;  // Reverse ball's Y direction
+            }
+
+            // Clear the canvas before drawing
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the paddles and ball
+            drawPaddles();
+            drawBall();
+        }
+
+        // Game loop
+        function gameLoop() {
+            updateBall();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Ping Pong Game</h1>
+    <!-- draw the Rect for pingpong -->
+    <canvas id="gameCanvas" width="600" height="400" style="background-color: black; border: 2px solid red; margin: 150px;"></canvas>
+
+    <script id="Game" >
+        console.log("he go inside script");
+        const canvas = document.getElementById('gameCanvas');
+        //getcONTEXT: METHOD RETURN DRAWING AREA LIGHATRSAM fih
+        const context = canvas.getContext('2d');
+
+
+        const paddleWidth = 10;
+        const paddleHeight = 75;
+        const playerX = 0;
+        const aiX = canvas.width - paddleWidth;
+        let playerY = (canvas.height - paddleHeight) / 2;
+        let aiY = (canvas.height - paddleHeight) / 2;
+        function drawPaddles()
+        {
+            context.fillStyle = 'white';
+            context.fillRect(playerX, playerY, paddleWidth, paddleHeight);
+            context.fillStyle = 'white';
+            context.fillRect(aiX, aiY, paddleWidth, paddleHeight);
+        }
+        
+        //Draw the ball on the canvas
+        const ballRadius = 10;
+        let ballX = canvas.width / 2; 
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 2;
+        let ballSpeedY = 2;
+        function drawBall()
+        {
+            context.beginPath();
+            context.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
+            context.fill();
+            context.closePath();
+        }
+
+        function updateBall()
+        {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            if (ballY + ballRadius > canvas.height || ballY -  ballRadius < 0)
+                ballSpeedY = -ballSpeedY;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawPaddles();
+            drawBall();
+        }
+        
+
+        function gameLoop()
+        {
+            updateBall();
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+    </script>
+</body>
+</html>

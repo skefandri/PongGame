@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+</head>
+<body>
+    <h1>Ping Pong Game</h1>
+    <canvas id="gameCanvas" width="600" height="400" style="border: 2px solid red; background-color: black; margin: 150px;"></canvas>
+    <div id="gameOverScreen" style="display: none;">
+        <h2 id="winnerMessage">Game Over</h2>
+        <button id="restartButton">Restart Game</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+
+        const paddleWidth = 10;
+        const paddleHeight = 75;
+        const playerX = 0;  // X position of player paddle
+        const aiX = canvas.width - paddleWidth;  // X position of AI paddle
+        const playerY = (canvas.height - paddleHeight) / 2;  // Y position of player paddle
+        let aiY = (canvas.height - paddleHeight) / 2;  // Y position of AI paddle
+
+        const ballRadius = 10;
+        let ballX = canvas.width / 2;  // Initial X position of ball
+        let ballY = canvas.height / 2;  // Initial Y position of ball
+        let ballSpeedX = 2;  // Speed of ball in X direction
+        let ballSpeedY = 2;  // Speed of ball in Y direction
+
+        let playerScore = 0;
+        let aiScore = 0;
+        const winningScore = 3;
+
+        let upPressed = false;
+        let downPressed = false;
+        let gameOver = false;
+
+        document.addEventListener('keydown', keyDownHandler);
+        document.addEventListener('keyup', keyUpHandler);
+
+        function keyDownHandler(event)
+        {
+            if (event.key === 'w' || event.key === 'W')
+                upPressed = true;
+            else if (event.key === 's' || event.key === 'S')
+                downPressed = true;
+        }
+
+        function keyUpHandler(event)
+        {
+            if (event.key === 'w' || event.key === 'W')
+                upPressed = false;
+            else if (event.key === 's' || event.key === 'S')
+                downPressed = false;
+        }
+
+        function drawPaddles()
+        {
+            context.fillStyle = 'white';
+            context.fillRect(playerX, playerY, paddleWidth, paddleHeight);
+            context.fillRect(aiX, aiY, paddleWidth, paddleHeight);
+        }
+
+        function drawBall()
+        {
+            context.beginPath();
+            context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            context.fillStyle = 'white';
+            context.fill();
+            context.closePath();
+        }
+
+        function drawScores()
+        {
+            context.font = '16px Arial';
+            context.fillStyle = 'white';
+            context.fillText('Player: ' + playerScore, 20, 20);
+            context.fillText('AI: ' + aiScore, canvas.width - 60, 20);
+        }
+
+        function updateBall() {
+            if (!gameOver)
+            {
+                ballX += ballSpeedX;
+                ballY += ballSpeedY;
+
+                // Check for collision with top and bottom walls
+                if (ballY + ballRadius > canvas.height || ballY - ballRadius < 0) {
+                    ballSpeedY = -ballSpeedY;
+                }
+
+                // Check for collision with paddles
+                checkPaddleCollision();
+
+                // Check for scoring conditions
+                if (ballX + ballRadius > canvas.width) {
+                    playerScore += 1;
+                    if (playerScore >= winningScore)
+                    {
+                        gameOver = true;
+                        displayWinner("Player");
+                    }
+                    resetBall();
+                }
+                else if (ballX - ballRadius < 0)
+                {
+                    aiScore += 1;
+                    if (aiScore >= winningScore)
+                    {
+                        gameOver = true;
+                        displayWinner("AI");
+                    }
+                    resetBall();
+                }
+
+                // Clear the canvas and redraw the game elements
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                drawPaddles();
+                drawBall();
+                drawScores();
+            }
+        }
+
+        function checkPaddleCollision() {
+            // Player paddle collision
+            if (ballX - ballRadius < playerX + paddleWidth && ballY > playerY && ballY < playerY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+                ballX = playerX + paddleWidth + ballRadius;  // Adjust ball position to avoid sticking
+            }
+            
+            // AI paddle collision
+            if (ballX + ballRadius > aiX && ballY > aiY && ballY < aiY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+                ballX = aiX - ballRadius;  // Adjust ball position to avoid sticking
+            }
+        }
+
+        function movePaddles() {
+            if (upPressed && playerY > 0)
+                playerY -= 5;  // Move paddle up
+            else if (downPressed && playerY < canvas.height - paddleHeight)
+                playerY += 5;  // Move paddle down
+            
+
+            // AI paddle movement
+            if (ballY < aiY + paddleHeight / 2 && aiY > 0)
+                aiY -= 4;  // Move AI paddle up
+            else if (ballY > aiY + paddleHeight / 2 && aiY < canvas.height - paddleHeight)
+                aiY += 4;  // Move AI paddle down
+        }
+
+        function resetBall()
+        {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = -ballSpeedX;
+            ballSpeedY = 2;
+        }
+
+        function displayWinner(winner)
+        {
+            document.getElementById('gameOverScreen').style.display = 'block';
+            document.getElementById('winnerMessage').innerText = winner + " wins!";
+        }
+
+        document.getElementById('restartButton').addEventListener('click', function()
+        {
+            playerScore = 0;
+            aiScore = 0;
+            gameOver = false;
+            document.getElementById('gameOverScreen').style.display = 'none';
+            resetBall();
+            gameLoop();
+        });
+
+        function gameLoop() {
+            movePaddles();
+            updateBall();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

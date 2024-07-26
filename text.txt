@@ -1,0 +1,2 @@
+WebSockets enable bidirectional communication between the client and the server, allowing you to push updates to the client without the need for the client to request data continuously.
+you’ll need to add a channel_layers setting to your settings file. This setting tells Django Channels which backend to use for storing and distributing messages between the client and the server. In this example, we'll use the in-memory backend, which is suitable for development and testing purposes:
